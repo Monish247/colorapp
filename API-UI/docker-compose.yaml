@@ -1,0 +1,58 @@
+#version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: colorsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: plantops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  dotnetapi:
+    image: monish247/colordotnet:v3
+    container_name: dotnetapi
+    ports:
+      - "5241:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=colorsdb;Username=postgres;Password=plantops"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  reactui:
+    image: monish247/react_ui:v1
+    container_name: reactui
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dotnetapi
+    networks:
+      - app-network
+  nginx: 
+    image: nginx:latest
+    container_name: nginx
+    ports: 
+      - "82:80"
+    depends_on: 
+      - dotnetapi
+      - reactui
+      - postgres    
+    volumes: 
+        - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
