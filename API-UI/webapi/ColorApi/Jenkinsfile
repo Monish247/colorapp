@@ -12,16 +12,16 @@ pipeline {
             steps {
                 git 'https://github.com/Monish247/colorapp.git'
             }
-        }
-
+        } 
         stage('Build') {
             steps {
                 script {
                     // Restoring dependencies
                     //bat "cd ${DOTNET_CLI_HOME} && dotnet restore"
                      
-                    cd API-UI/webapi/ColorApi
+                    bat 'cd API-UI\\webapi\\ColorApi && dotnet restore'
                     bat "dotnet restore"
+
                     // Building the application
                     bat "dotnet build --configuration Release"
                 }
