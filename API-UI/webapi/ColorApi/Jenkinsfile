@@ -35,7 +35,7 @@ pipeline {
                 script {
                     // Running tests
                    bat '''
-                       dotnet build 
+                       dotnet build --configuration Release
                        cd /bin/Debug/net9.0
                        echo "show .dll in curent directory"
                        dir *.dll
