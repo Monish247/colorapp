@@ -53,7 +53,7 @@ pipeline {
                         cd API-UI\\webapi\\ColorApi
                         dir
                         dotnet publish -c Release --property:PublishDir=./publish
-                        dir publish
+                        dir 
                     '''
                         archiveArtifacts artifacts: 'publish/**', fingerprint: true
                 }
