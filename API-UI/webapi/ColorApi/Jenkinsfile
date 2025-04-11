@@ -22,7 +22,6 @@ pipeline {
                      
                     cd API-UI/webapi/ColorApi
                     bat "dotnet restore"
-
                     // Building the application
                     bat "dotnet build --configuration Release"
                 }
