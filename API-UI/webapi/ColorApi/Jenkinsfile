@@ -22,7 +22,6 @@ pipeline {
 
                     bat '''
                         cd API-UI\\webapi\\ColorApi
-                        echo Current Directory:
                         cd
                         dir
                         dotnet restore
