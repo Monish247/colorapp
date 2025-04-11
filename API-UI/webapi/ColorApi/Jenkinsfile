@@ -20,7 +20,7 @@ pipeline {
                 script {
                     // Restoring dependencies
                     //bat "cd ${DOTNET_CLI_HOME} && dotnet restore"
-                    cd API-UI\webapi\ColorApi
+                    cd API-UI/webapi/ColorApi
                     bat "dotnet restore"
                     // Building the application
                     bat "dotnet build --configuration Release"
