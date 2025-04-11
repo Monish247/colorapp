@@ -35,9 +35,7 @@ pipeline {
                 script {
                     // Running tests
                    bat '''
-                       cd 
                        dir 
-                       cd API-UI\\webapi\\ColorApi
                        dotnet build --configuration Release
                        cd .\\bin\\Debug\\net9.0
                        echo "show .dll in curent directory"
