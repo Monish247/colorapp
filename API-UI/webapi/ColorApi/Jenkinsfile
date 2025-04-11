@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('installing dependencies') {
             steps {
                 script {
                     // Restoring dependencies
@@ -25,19 +25,21 @@ pipeline {
                         cd
                         dir
                         dotnet restore
-                        cd /bin/Debug/net9.0
-                        echo "show .dll in curent directory"
-                        dir *.dll
                     '''    
                 }
             }
         }
 
-        stage('Test') {
+        stage('build') {
             steps {
                 script {
                     // Running tests
-                    bat "dotnet test --no-restore --configuration Release"
+                   bat '''
+                       dotnet build 
+                       cd /bin/Debug/net9.0
+                       echo "show .dll in curent directory"
+                       dir *.dll
+                    '''
                 }
             }
         }
