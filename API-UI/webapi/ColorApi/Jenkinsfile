@@ -49,6 +49,7 @@ pipeline {
 
         stage('Publish') {
             steps {
+                dir
                 bat 'dotnet publish -c Release -o ./publish'
                 archiveArtifacts artifacts: 'publish/**', fingerprint: true
             }
