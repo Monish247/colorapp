@@ -49,10 +49,14 @@ pipeline {
 
         stage('Publish') {
             steps {
-                bat 'dir'
-                bat 'cd API-UI\\webapi\\ColorApi'
-                bat 'dotnet publish -c Release -o ./publish'
-                archiveArtifacts artifacts: 'publish/**', fingerprint: true
+                bat '''
+                   echo ""
+                   dir
+                   cd API-UI\\webapi\\ColorApi
+                   dir
+                   dotnet publish -c Release -o ./publish
+                   archiveArtifacts artifacts: 'publish/**', fingerprint: true
+                '''
             }
         }
 
