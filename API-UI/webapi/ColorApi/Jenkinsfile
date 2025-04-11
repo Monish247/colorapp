@@ -17,12 +17,25 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    def dotnetHome = tool name: 'dotnet-sdk', type: 'DotNetCoreSdk'
-                    env.PATH = "${dotnetHome}/bin:${env.PATH}"
+                    // Restoring dependencies
+                    //bat "cd ${DOTNET_CLI_HOME} && dotnet restore"
+                    bat "dotnet restore"
+
+                    // Building the application
+                    bat "dotnet build --configuration Release"
                 }
-                bat 'dotnet build'
             }
         }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Running tests
+                    bat "dotnet test --no-restore --configuration Release"
+                }
+            }
+        }
+
 
         stage('Publish') {
             steps {
