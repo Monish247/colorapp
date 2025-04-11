@@ -35,6 +35,7 @@ pipeline {
                 script {
                     // Running tests
                    bat '''
+                       dir 
                        cd API-UI\\webapi\\ColorApi
                        dotnet build --configuration Release
                        cd \\bin\\Debug\\net9.0
