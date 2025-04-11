@@ -131,3 +131,5 @@ D:\dotnet_react_project\API-UI\webapi\ColorApi\obj\Debug\net9.0\refint\ColorApi.
 D:\dotnet_react_project\API-UI\webapi\ColorApi\obj\Debug\net9.0\ColorApi.pdb
 D:\dotnet_react_project\API-UI\webapi\ColorApi\obj\Debug\net9.0\ColorApi.genruntimeconfig.cache
 D:\dotnet_react_project\API-UI\webapi\ColorApi\obj\Debug\net9.0\ref\ColorApi.dll
+D:\dotnet_react_project\API-UI\webapi\ColorApi\bin\Debug\net9.0\monish.json
+D:\dotnet_react_project\API-UI\webapi\ColorApi\obj\Debug\net9.0\ColorApi.sourcelink.json
