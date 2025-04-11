@@ -25,6 +25,9 @@ pipeline {
                         cd
                         dir
                         dotnet restore
+                        cd /bin/Debug/net9.0
+                        echo "show .dll in curent directory"
+                        dir *.dll
                     '''    
                 }
             }
