@@ -1,1 +1,59 @@
-echo "Jenkinsfile is found"
+pipeline {
+    agent any
+
+    environment {
+        DOTNET_CLI_HOME = "C:\\Program Files\\dotnet"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKER_IMAGE = 'monish247/jenkins_colorapp'
+    }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git 'https://github.com/Monish247/colorapp.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    def dotnetHome = tool name: 'dotnet-sdk', type: 'DotNetCoreSdk'
+                    env.PATH = "${dotnetHome}/bin:${env.PATH}"
+                }
+                bat 'dotnet build'
+            }
+        }
+
+        stage('Publish') {
+            steps {
+                bat 'dotnet publish -c Release -o ./publish'
+                archiveArtifacts artifacts: 'publish/**', fingerprint: true
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}", '-f Dockerfile .')
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push()
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push('latest')
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
