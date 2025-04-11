@@ -52,6 +52,8 @@ pipeline {
                         dir
                         cd API-UI\\webapi\\ColorApi
                         dir
+                        mkdir publish
+                        dir
                         dotnet publish -c Release --property:PublishDir=./publish
                         dir publish
                     '''
