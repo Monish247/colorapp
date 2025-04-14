@@ -2,85 +2,71 @@ pipeline {
     agent any
 
     environment {
-        DOTNET_CLI_HOME = "C:\\Program Files\\dotnet"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKER_IMAGE = 'monish247/jenkins_colorapp'
+        DOCKERHUB_CREDENTIALS = 'DOCKERHUB_CREDENTIALS'  // Jenkins credential ID
+        DOCKER_IMAGE_NAME = 'monish247/colorapp_jenkins'
+        DOCKER_TAG = 'latest'
+        DOCKER_USERNAME = 'monish247' // <-- Replace with your Docker Hub username
     }
 
     stages {
-        stage('Git Checkout') {
+        stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Monish247/colorapp.git'
             }
         }
-        stage('installing dependencies') {
-            steps {
-                script {
-                    // Restoring dependencies
-                    //bat "cd ${DOTNET_CLI_HOME} && dotnet restore"
 
-                    bat '''
-                        cd API-UI\\webapi\\ColorApi
-                        cd
-                        dir
-                        dotnet restore
-                    '''    
-                }
-            }
-        }
-        stage('build') {
+        stage('Restore Dependencies') {
             steps {
-                script {
-                    // Running tests
-                   bat '''
-                       dir 
-                       cd API-UI\\webapi\\ColorApi
-                       dir
-                       dotnet build --configuration Release
-                       cd .\\bin\\Debug\\net9.0
-                       echo "show .dll in curent directory"
-                       dir *.dll
-                    '''
+                dir('API-UI/webapi/ColorApi') {
+                    sh 'dotnet restore'
                 }
             }
         }
+
+        stage('Build') {
+            steps {
+                dir('API-UI/webapi/ColorApi') {
+                    sh 'dotnet build --configuration Release'
+                }
+            }
+        }
+
         stage('Publish') {
             steps {
-                script{
-                    bat '''
-                        echo "checking directory"
-                        dir
-                        cd API-UI\\webapi\\ColorApi
-                        dir
-                        dotnet publish -c Release --property:PublishDir=./publish
-                        dir 
-                    '''
-                        archiveArtifacts artifacts: 'publish/**', fingerprint: true
-                }
-            }   
-        }
-        stage('Docker Build') {
-            steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}", '-f Dockerfile .')
+                dir('API-UI/webapi/ColorApi') {
+                    sh 'dotnet publish --configuration Release --output ./publish'
                 }
             }
         }
-        stage('Docker Push') {
+
+        stage('Build Docker Image') {
+            steps {
+                dir('API-UI/webapi/ColorApi') {
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} -f Dockerfile ."
+                }
+            }
+        }
+
+        stage('Docker login and pushing image to Docker hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push()
-                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push('latest')
+                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhubpwd')]) {
+                     sh 'docker login -u ${DOCKER_USERNAME}'
+}
                     }
+
+                    sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                 }
             }
         }
     }
 
     post {
-        always {
-            cleanWs()
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Please check the logs.'
         }
     }
 }
