@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = 'DOCKERHUB_CREDENTIALS'  // Jenkins credential ID
+        DOCKERHUB_CREDENTIALS = 'dockerhub_pwd' // Jenkins secret text ID
         DOCKER_IMAGE_NAME = 'monish247/colorapp_jenkins'
         DOCKER_TAG = 'latest'
-        DOCKER_USERNAME = 'monish247' // <-- Replace with your Docker Hub username
+        DOCKER_USERNAME = 'monish247' // Your Docker Hub username
     }
 
     stages {
@@ -50,24 +50,15 @@ pipeline {
         stage('Docker login and pushing image to Docker hub') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhubpwd')]) {
-                     sh 'docker login -u ${DOCKER_USERNAME}'
-}
+                    withCredentials([string(credentialsId: "${DOCKERHUB_CREDENTIALS}", variable: 'dockerhubpwd')]) {
+                        sh "echo ${dockerhubpwd} | docker login -u ${DOCKER_USERNAME} --password-stdin"
                     }
-
                     sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                 }
             }
         }
-        stage('deployment using docker compose ')
-            steps{
-                script {
-                    sh 'echo "printing current directory : $PWD"'
-                    
-                }
-            }
     }
-    
+
     post {
         success {
             echo '✅ Pipeline completed successfully!'
