@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'nodejs'
+    }
+
+    environment {
+        DOCKERHUB_CREDENTIALS = 'DOCKERHUB_CREDENTIALS'
+        DOCKER_IMAGE_NAME = 'monish247/colorapp_react_jenkins'
+        DOCKER_TAG = 'latest'
+        DOCKER_USERNAME = 'monish247'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Monish247/colorapp.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('API-UI/webui/colors-app') {
+                    sh 'echo "printing current directory: $PWD"'
+                    sh 'npm install -g pnpm'
+                    sh 'node -v'
+                    sh 'pnpm install'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('API-UI/webui/colors-app') {
+                    sh 'pnpm run build'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('API-UI/webui/colors-app') {
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} -f Dockerfile ."
+                }
+            }
+        }
+
+        stage('Docker Login and Push') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhubpwd')]) {
+                        sh "docker login -u ${DOCKER_USERNAME} -p ${dockerhubpwd}"
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                    }
+                }
+            }
+        }
+    }
+}
