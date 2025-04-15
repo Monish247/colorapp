@@ -19,7 +19,7 @@ services:
       - app-network
 
   dotnetapi:
-    image: monish247/colorapp_jenkins
+    image: monish247/colorapp_jenkins:latest
     container_name: dotnetapi
     ports:
       - "5241:8080"

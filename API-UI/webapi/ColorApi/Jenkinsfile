@@ -59,8 +59,15 @@ pipeline {
                 }
             }
         }
+        stage('deployment using docker compose ')
+            steps{
+                script {
+                    sh 'echo "printing current directory : $PWD"'
+                    
+                }
+            }
     }
-
+    
     post {
         success {
             echo '✅ Pipeline completed successfully!'
